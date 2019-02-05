@@ -1,0 +1,90 @@
+#git repo used in project git clone https://github.com/Azure-Samples/azure-voting-app-redis.git
+
+#in directory made from repo run 
+docker-compose up -d
+to create containers and start application
+
+docker images shows created images
+docker ps shows running containers 
+
+docker-compose down stops containers 
+
+#create azure resource group
+az group create --name $GROUPNAME --location eastus
+#create azure container registry
+az acr create --resource-group $GROUPNAME --name $ACRNAME --sku Basic
+#login to acr 
+az acr login --name $ACRNAME
+#find acr login server 
+az acr list --resource-group $GROUPNAME --query "[].{acrLoginServer:loginServer}" --output table
+#tag image 
+docker tag azure-vote-front $LOGINSERVER/azure-vote-front:v1
+#push image to acr (make sure you are logged in to acr or else unauthorized error)
+docker push $LOGINSERVER/azure-vote-front:v1
+#get list of images in acr 
+az acr repository list --name $ACRNAME --output table
+#get tags for acr image
+az acr repository show-tags --name $ACRNAME --repository azure-vote-front --output table
+
+#create active directory service principal for AKS cluster to interact with Azure resources
+az ad sp create-for-rbac --skip-assignment (returns appID,displayName,name,password,tenant)
+#get acr resource id $ACRID
+az acr show --resource-group $GROUPNAME --name $ACRNAME --query "id" --output tsv
+#create role for aks to use acr images
+az role assignment create --assignee $APPID --scope $ACRID --role Reader
+#create AKS cluster 
+az aks create \
+    --resource-group $GROUPNAME \
+    --name $CLUSTERNAME \
+    --node-count 1 \
+    --service-principal $APPID \
+    --client-secret $ADPASS \
+    --generate-ssh-keys
+
+#cli for kubernetes (kubectl)
+az aks install-cli
+#configure kubectl
+az aks get-credentials --resource-group $GROUPNAME --name $CLUSTERNAME
+#show nodes
+kubectl get nodes
+
+#don't forget to make changes to .yaml for to use acr for azure-vote-front
+#deploy application
+kubectl apply -f azure-vote-all-in-one-redis.yaml
+#monitor deployment 
+kubectl get service azure-vote-front --watch
+
+
+#scalling
+#manual 
+kubectl scale --replicas=5 deployment/azure-vote-front
+#autoscale first get aks cluster version
+az aks show --resource-group $GROUPNAME --name $CLUSTERNAME --query kubernetesVersion
+#if aks cluster version is less than 1.10
+git clone https://github.com/kubernetes-incubator/metrics-server.git
+kubectl create -f metrics-server/deploy/1.8+/
+#set autoscale
+kubectl autoscale deployment azure-vote-front --cpu-percent=50 --min=3 --max=10
+
+#update application 
+#build another image 
+docker-compose up --build -d
+#tag new name
+docker tag azure-vote-front $LOGINSERVER/azure-vote-front:<newTag>
+#push new image
+docker push $LOGINSERVER/azure-vote-front:<newTag>
+#to provide maxium uptime need multiple front end instances
+kubectl scale --replicas=3 deployment/azure-vote-front
+kubectl set image deployment azure-vote-front azure-vote-front=$LOGINSERVER/azure-vote-front:<newTag>
+#track progress
+kubectl get pods
+
+#update AKS cluster
+#check for AKS upgrades
+az aks get-upgrades --resource-group $GROUPNAME --name $CLUSTERNAME --output table
+#upgrade cluster 
+az aks upgrade --resource-group $GROUPNAME --name $CLUSTERNAME --kubernetes-version 1.10.9
+
+#delete everything
+az group delete --name $GROUPNAME --yes --no-wait
+
