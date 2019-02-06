@@ -1,7 +1,7 @@
 # Azure Vote UI controll
-title: "Best Tribe"
-value1: Front-End
-value2: Platform-Engineering
+title: "Best Office"
+value1: Dallas
+value2: NewYork
 
 # Service controlls
 serviceNameFront: azure-vote-front
