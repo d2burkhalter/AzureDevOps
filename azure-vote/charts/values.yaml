@@ -1,7 +1,7 @@
 # Azure Vote UI controll
-title: "Azure Vote App"
-value1: Cats
-value2: Dogs
+title: "Best Tribe"
+value1: Front-End
+value2: Platform-Engineering
 
 # Service controlls
 serviceNameFront: azure-vote-front
