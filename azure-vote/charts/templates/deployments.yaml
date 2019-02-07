@@ -34,7 +34,7 @@ spec:
     spec:
       containers:
       - name: azure-vote-front
-        image: 
+        image: $(acrLocation):latest
         imagePullPolicy: Always
         ports:
         - containerPort: 80
