@@ -1,3 +1,4 @@
+#instructions to manually provision and run application
 #git repo used in project git clone https://github.com/Azure-Samples/azure-voting-app-redis.git
 
 #in directory made from repo run 
