@@ -34,7 +34,7 @@ spec:
     spec:
       containers:
       - name: azure-vote-front
-        image: $(imageLocation):$(Build.BuildId)
+        image: daviddevopsacr.azurecr.io/daviddevops:21
         imagePullPolicy: Always
         ports:
         - containerPort: 80
