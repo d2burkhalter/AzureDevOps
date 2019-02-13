@@ -45,11 +45,9 @@ try:
 except redis.ConnectionError:
     exit('Failed to connect to Redis, terminating.')
 
-hostName = ""
 # Change title to host name to demo NLB
 if app.config['SHOWHOST'] == "true":
-    hostName = " HostName: " + socket.gethostname()
-
+    hostName = socket.gethostname()
 
 # Init Redis
 if not r.get(button1): r.set(button1,0)
@@ -67,7 +65,7 @@ def index():
         # vote3 = r.get(button3).decode('utf-8')            
 
         # Return index with values
-        return render_template("index.html", value1=int(vote1), value2=int(vote2),button1=button1, button2=button2, title=title,hostName = hostName)
+        return render_template("index.html", value1=int(vote1), value2=int(vote2),button1=button1, button2=button2, title=title, hostName = hostName)
 
     elif request.method == 'POST':
 
@@ -80,7 +78,7 @@ def index():
             vote1 = r.get(button1).decode('utf-8')
             vote2 = r.get(button2).decode('utf-8')
             # vote3 = r.get(button3).decode('utf-8')
-            return render_template("index.html", value1=int(vote1), value2=int(vote2), button1=button1, button2=button2, title=title,hostName = hostName)
+            return render_template("index.html", value1=int(vote1), value2=int(vote2), button1=button1, button2=button2, title=title, hostName = hostName)
         
         else:
 
@@ -93,7 +91,7 @@ def index():
             vote2 = r.get(button2).decode('utf-8')  
             # vote3 = r.get(button3).decode('utf-8')
             # Return results
-            return render_template("index.html", value1=int(vote1), value2=int(vote2), button1=button1, button2=button2, title=title,hostName = hostName)
+            return render_template("index.html", value1=int(vote1), value2=int(vote2), button1=button1, button2=button2, title=title, hostName = hostName)
 
 if __name__ == "__main__":
     app.run()
