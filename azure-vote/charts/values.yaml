@@ -1,7 +1,7 @@
 # Azure Vote UI controll
-title: "Best Food"
-value1: Pizza
-value2: Hamburgers
+title: "Best Breakfast"
+value1: Pancakes
+value2: Waffles
 
 # Service controlls
 serviceNameFront: azure-vote-front
