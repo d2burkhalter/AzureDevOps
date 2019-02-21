@@ -1,7 +1,7 @@
 # Azure Vote UI controll
-title: "Best Breakfast"
-value1: French Toast
-value2: Eggs
+title: "Best Luch"
+value1: Sandwich
+value2: Salad
 
 # Service controlls
 serviceNameFront: azure-vote-front
